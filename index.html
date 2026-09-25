@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Banco de Prompts IA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;600;700&family=Poppins:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#F7F3FA;--surface:#FFFFFF;--prompt:#F5EEF8;--ink:#422C59;--muted:#6E5C82;--line:#E2D6EA;
+  --accent:#8844A6;--accent-ink:#FFFFFF;--star:#D46BAE;--band:#422C59;--band-ink:#FFFFFF;--pink:#F2C4E2;
+  --c1:#8844A6;--c2:#5A3E7A;--c3:#C2519B;--c4:#6F58A8;--c5:#9A5FA3;--c6:#422C59;--c7:#B0428A;--c8:#7A6A95;
+  --display:"Source Code Pro",ui-monospace,monospace;--body:"Poppins",system-ui,sans-serif;--mono:"Source Code Pro",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;--bg:#1C1426;--surface:#271C35;--prompt:#30233F;--ink:#F3EAF8;--muted:#BBA8CC;--line:#3E2F52;--accent:#B98EBF;--accent-ink:#1C1426;--star:#F2C4E2;--band:#2E1F40;--band-ink:#FFFFFF;
+  --c1:#C79BE0;--c2:#B7A2D8;--c3:#F2C4E2;--c4:#A99BE0;--c5:#D9A9DF;--c6:#E0D0F0;--c7:#F0A6D2;--c8:#BDB0D6}}
+:root[data-theme="dark"]{
+  color-scheme:dark;--bg:#1C1426;--surface:#271C35;--prompt:#30233F;--ink:#F3EAF8;--muted:#BBA8CC;--line:#3E2F52;--accent:#B98EBF;--accent-ink:#1C1426;--star:#F2C4E2;--band:#2E1F40;--band-ink:#FFFFFF;
+  --c1:#C79BE0;--c2:#B7A2D8;--c3:#F2C4E2;--c4:#A99BE0;--c5:#D9A9DF;--c6:#E0D0F0;--c7:#F0A6D2;--c8:#BDB0D6}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;padding:24px 16px 48px}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:18px;background:var(--band);color:var(--band-ink);border-radius:16px;padding:22px 24px;position:relative;overflow:hidden}
+header::after{content:"</>  { }  #  @  ;  </>  { }  #";position:absolute;right:-10px;bottom:-14px;font-family:var(--mono);font-size:64px;font-weight:700;color:#8844A6;opacity:.35;white-space:nowrap;pointer-events:none}
+header>*{position:relative;z-index:1}
+.logo{display:flex;flex-direction:column;line-height:.9}
+.logo .d{font-family:var(--mono);font-size:20px;letter-spacing:.12em}
+.logo .t{font-family:var(--body);font-weight:700;font-size:40px;letter-spacing:-.04em;display:flex;align-items:center}
+.logo .dot{display:inline-grid;place-items:center;width:.72em;height:.72em;border-radius:50%;background:var(--band-ink);margin-left:.04em;margin-top:.1em}
+.logo .dot svg{width:.36em;height:.36em}
+.brandrow{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.htext .tag-b{font-family:var(--mono);color:#F2C4E2;font-weight:700;font-size:14px}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(24px,4vw,34px);line-height:1.05;margin:2px 0 0;letter-spacing:-.025em;text-wrap:balance}
+.sub{color:#E6D8EF;font-size:13.5px;margin:6px 0 0;max-width:60ch}
+.count{font-family:var(--mono);font-size:13px;font-weight:600;background:#F2C4E2;color:#422C59;border-radius:999px;padding:5px 14px}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px}
+input,select,textarea,button{font:inherit;color:inherit}
+#q{flex:1 1 260px;min-width:0;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+select{padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 14px;cursor:pointer;font-size:14px;font-weight:500}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+.btn.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn.sm{padding:6px 10px;font-size:13px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;border-top:4px solid var(--cat)}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.cat{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--cat);font-weight:500}
+.card h3{font-family:var(--body);font-weight:600;letter-spacing:-.01em;font-size:18px;line-height:1.2;margin:4px 0 0}
+.star{background:none;border:0;cursor:pointer;font-size:20px;line-height:1;color:var(--line);padding:2px}
+.star.fav{color:var(--star)}
+.ptext{font-family:var(--mono);font-size:12.5px;background:var(--prompt);border-radius:8px;padding:10px 12px;margin:0;white-space:pre-wrap;max-height:9.5em;overflow:auto;flex:1}
+mark{background:color-mix(in srgb,var(--accent) 25%,transparent);color:inherit}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted)}
+.actions{display:flex;gap:8px}
+.actions .btn{flex:1}
+.del.confirm{background:#C92A2A;color:#fff;border-color:#C92A2A}
+.empty{text-align:center;color:var(--muted);padding:40px}
+dialog{border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);width:min(560px,calc(100% - 32px));padding:20px}
+dialog::backdrop{background:rgba(10,12,20,.5)}
+dialog form{display:flex;flex-direction:column;gap:12px}
+dialog label{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600}
+dialog input,dialog textarea,dialog select{padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--prompt);font-weight:400}
+dialog textarea{font-family:var(--mono);font-size:13px;min-height:160px;resize:vertical}
+dialog h2{font-family:var(--display);margin:0;font-size:22px}
+.row{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.hint{font-size:12px;color:var(--muted);margin:0}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:14px;font-weight:500}
+@media (prefers-reduced-motion:no-preference){.card{transition:border-color .15s}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="brandrow">
+      <div class="logo" aria-label="daniela tirado"><span class="d">daniela</span><span class="t">tirad<span class="dot"><svg viewBox="0 0 10 14"><path d="M1 1v10l2.6-2.4 1.8 4 1.6-.8-1.8-3.8H9z" fill="#422C59"/></svg></span></span></div>
+      <div class="htext">
+        <span class="tag-b">[ curso de contenido con IA ]</span>
+        <h1>Banco de Prompts</h1>
+        <p class="sub">Reemplaza lo que está entre [CORCHETES] con los datos de tu marca.</p>
+      </div>
+    </div>
+    <span class="count" id="count">0 prompts</span>
+  </header>
+
+  <div class="toolbar">
+    <input id="q" type="search" placeholder="Buscar por título, texto o etiqueta…" aria-label="Buscar">
+    <select id="cat" aria-label="Categoría"></select>
+    <button class="btn primary" id="new">+ Nuevo prompt</button>
+  </div>
+  <div class="chips">
+    <button class="btn sm" id="favs">★ Solo favoritos</button>
+    <button class="btn sm" id="exp">Exportar backup</button>
+    <button class="btn sm" id="imp">Importar backup</button>
+    <button class="btn sm" id="reset">Restaurar originales</button>
+  </div>
+
+  <main class="grid" id="grid"></main>
+</div>
+
+<dialog id="dlg">
+  <form id="form">
+    <h2 id="dlgTitle">Nuevo prompt</h2>
+    <label>Título<input id="fTitle" required></label>
+    <label>Categoría<input id="fCat" list="catList" required placeholder="Ej: Hooks"></label>
+    <datalist id="catList"></datalist>
+    <label>Prompt<textarea id="fText" required></textarea></label>
+    <label>Etiquetas (separadas por coma)<input id="fTags" placeholder="hooks, reels"></label>
+    <div class="row"><button type="button" class="btn" id="cancel">Cancelar</button><button class="btn primary" type="submit">Guardar</button></div>
+  </form>
+</dialog>
+
+<dialog id="io">
+  <form id="ioForm">
+    <h2 id="ioTitle">Backup</h2>
+    <p class="hint" id="ioHint"></p>
+    <textarea id="ioText" aria-label="Backup"></textarea>
+    <label>O sube un archivo .json<input type="file" id="ioFile" accept=".json,application/json"></label>
+    <div class="row"><button type="button" class="btn" id="ioClose">Cerrar</button><button type="button" class="btn primary" id="ioAction">Copiar</button></div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const SEED=[
+["Hooks","5 hooks que detienen el scroll","Actúa como estratega de contenido. Escribe 5 hooks (primera frase) para un reel de [MARCA] sobre [TEMA], dirigido a [BUYER PERSONA]. Cada hook debe generar curiosidad en menos de 3 segundos. Usa estilos distintos: pregunta, dato sorprendente, error común, promesa y confesión.","hooks, reels"],
+["Hooks","Hooks de error común","Escribe 5 hooks que empiecen señalando un error que comete [BUYER PERSONA] con [PROBLEMA]. Tono cercano, sin juzgar. Ejemplo de estructura: \"Si haces [X], estás perdiendo [Y]\".","hooks, dolor"],
+["Hooks","Hooks con dato","Escribe 5 hooks que arranquen con un dato o estadística llamativa sobre [TEMA], relevante para [BUYER PERSONA]. Indica si el dato debe verificarse antes de publicar.","hooks, datos"],
+["Estrategia","Pilares de contenido","Define 4 pilares de contenido para [MARCA], que vende [PRODUCTO/SERVICIO] a [BUYER PERSONA]. Para cada pilar: objetivo (awareness, confianza o venta), 3 ideas de publicación y el formato ideal.","pilares, estrategia"],
+["Estrategia","Calendario mensual","Arma un calendario de contenido para [MARCA] durante [MES], con [N] publicaciones por semana. Mezcla contenido de valor, comunidad y venta. Entrégalo en tabla: fecha, formato, tema, hook y CTA.","calendario, planificación"],
+["Estrategia","Fecha comercial","Diseña una mini estrategia de 2 semanas para [FECHA COMERCIAL] en [MARCA]: ideas de publicaciones, historias, una promoción y un cronograma día a día.","fechas, promociones"],
+["Estrategia","Buyer persona en 10 minutos","Con esta información de mi negocio: [DESCRIPCIÓN], crea el perfil de mi cliente ideal: edad, rutina, miedos, deseos, objeciones de compra, palabras que usa y redes donde pasa tiempo.","buyer persona, investigación"],
+["Reels / Guiones","Guion mito vs. realidad","Escribe el guion de un reel de 30 segundos formato \"mito vs. realidad\" sobre [TEMA] para [BUYER PERSONA]. Incluye 3 mitos, texto en pantalla, lo que se ve en cámara y CTA final.","reels, educativo"],
+["Reels / Guiones","Un día en la vida","Arma el guion de un reel \"un día en la vida de [ROL] en [MARCA]\" con un giro final que conecte con [PRODUCTO/SERVICIO]. Divide por tomas de 2–3 segundos.","reels, storytelling"],
+["Reels / Guiones","Antes y después","Escribe el guion de un reel antes/después que muestre [PROBLEMA] y cómo [PRODUCTO] lo resuelve. Incluye música sugerida, texto en pantalla y CTA.","reels, transformación"],
+["Reels / Guiones","Responder una objeción","Escribe el guion de un reel donde [MARCA] responde la objeción \"[OBJECIÓN]\". Tono empático, no defensivo, cerrando con un beneficio concreto.","reels, objeciones"],
+["Copywriting","Caption con storytelling","Escribe un caption para Instagram sobre [TEMA] usando storytelling: arranca con una situación cotidiana de [BUYER PERSONA], genera tensión y cierra con [PRODUCTO] como solución. Máximo 150 palabras y 3 hashtags.","caption, storytelling"],
+["Copywriting","Carrusel de tips","Escribe el copy de un carrusel de 7 slides sobre [TEMA]. Slide 1: hook. Slides 2–6: un tip por slide, breve y accionable. Slide 7: CTA para guardar o compartir.","carrusel, tips"],
+["Copywriting","Copy de venta PAS","Escribe un copy de venta para [PRODUCTO] usando la fórmula problema–agitación–solución, dirigido a [BUYER PERSONA]. Incluye un beneficio medible y un CTA claro.","venta, conversión"],
+["Copywriting","Testimonio a post","A partir de este testimonio real: \"[TESTIMONIO]\", escribe un post que resalte el resultado, conserve las palabras del cliente y motive a otros a escribir.","testimonio, prueba social"],
+["Historias","Encuesta en 3 historias","Crea una secuencia de 3 historias con encuesta sobre [TEMA] para mi audiencia. Historia 1: contexto. Historia 2: encuesta. Historia 3: resultado y aprendizaje.","historias, encuesta"],
+["Historias","Lanzamiento en 4 historias","Arma 4 historias para anunciar el lanzamiento de [PRODUCTO] en [MARCA], generando expectativa antes de revelarlo. Indica qué se muestra y el texto en cada una.","historias, lanzamiento"],
+["Historias","Detrás de cámaras sincero","Escribe el guion de una historia que muestre un error o detrás de cámaras real de [MARCA]. Que humanice la marca sin perder profesionalismo.","historias, autenticidad"],
+["Respuestas DM","Consulta de precio","Escribe una respuesta para DM cuando alguien pregunta el precio de [PRODUCTO] sin más contexto. Cálida, con el precio claro y una pregunta que ayude a recomendar la mejor opción.","dm, precio"],
+["Respuestas DM","Seguimiento sin presionar","Un cliente mostró interés en [PRODUCTO] pero no respondió. Escribe un mensaje de seguimiento amable que reabra la conversación sin sonar insistente.","dm, cierre"],
+["Respuestas DM","Reclamo o queja","Redacta una respuesta empática a un cliente que reclama por [PROBLEMA]. Reconoce el inconveniente, no te pongas a la defensiva y ofrece una solución concreta.","dm, servicio"],
+["Imágenes IA","Foto de producto lifestyle","Genera una fotografía de producto de [PRODUCTO] en [ESCENARIO], luz natural de [HORA DEL DÍA], estilo editorial, paleta [COLORES DE MARCA], encuadre vertical 4:5, fondo desenfocado, sin texto.","imagen, producto"],
+["Imágenes IA","Fondo para carrusel","Crea un fondo minimalista para carrusel de Instagram con los colores [COLORES DE MARCA], textura sutil, espacio libre en el centro para texto, formato 1080x1350.","imagen, diseño"],
+["Imágenes IA","Mockup de marca","Genera un mockup de [PIEZA: bolsa/etiqueta/caja] con el estilo de [MARCA]: [DESCRIPCIÓN DEL ESTILO], iluminación suave de estudio, vista 3/4, fondo neutro.","imagen, mockup"],
+["Análisis","Auditoría de mis publicaciones","Analiza el resumen de mis últimas 10 publicaciones de [MARCA] (temas, formatos y resultados): \"[PEGAR DATOS]\". Encuentra patrones de lo que funciona, lo que no, y dame 3 recomendaciones concretas.","análisis, métricas"],
+["Pauta","Estructura de campaña Meta Ads","Actúa como media buyer experto en Meta Ads. Propón la estructura de campaña para [MARCA], que vende [PRODUCTO] a [BUYER PERSONA] en [PAÍS/CIUDAD], con presupuesto de [PRESUPUESTO] diario. Objetivo: [VENTAS/LEADS/MENSAJES]. Incluye: tipo de campaña, número de conjuntos, segmentación de cada uno, cuántos anuncios probar y cómo repartir el presupuesto.","meta ads, estructura"],
+["Pauta","Copy de anuncio en 3 ángulos","Escribe 3 versiones de copy para un anuncio de Meta Ads de [PRODUCTO], cada una con un ángulo distinto: 1) dolor/problema, 2) beneficio/deseo, 3) prueba social. Para cada una: texto principal (máx. 125 caracteres visibles), título (máx. 40) y descripción. Público: [BUYER PERSONA].","meta ads, copy"],
+["Pauta","Ángulos de venta para testear","Dame 10 ángulos de venta distintos para anunciar [PRODUCTO] a [BUYER PERSONA]. Para cada ángulo: la idea central, el hook del anuncio y el tipo de creativo recomendado (UGC, estático, carrusel, demo). Ordénalos del que más probablemente convierta al que menos, y explica por qué.","ángulos, testeo"],
+["Pauta","Guion de anuncio UGC","Escribe el guion de un video UGC de 20–30 segundos para anunciar [PRODUCTO], grabado por una persona real con el celular. Estructura: hook (0–3 s), problema, descubrimiento del producto, demostración, resultado y CTA. Indica qué se ve y qué se dice en cada parte. Lenguaje natural de [PAÍS].","ugc, video"],
+["Pauta","Creativos estáticos","Propón 5 ideas de anuncios estáticos (imagen) para [PRODUCTO]: concepto visual, texto grande sobre la imagen (máx. 6 palabras), elementos gráficos y por qué detendría el scroll. Estilo de marca: [ESTILO/COLORES].","creativos, estático"],
+["Pauta","Segmentación de público","Para [PRODUCTO] dirigido a [BUYER PERSONA] en [PAÍS], sugiere: 3 públicos por intereses para Meta Ads, 2 públicos personalizados (ej. visitantes web, interacción en Instagram), 2 públicos similares y exclusiones recomendadas. Explica cuándo usar cada uno según la etapa del embudo.","segmentación, públicos"],
+["Pauta","Diagnóstico de métricas","Estas son las métricas de mi campaña de [OBJETIVO] en los últimos [DÍAS] días: gasto [X], impresiones [X], CTR [X]%, CPC [X], CPM [X], conversiones [X], costo por resultado [X], ROAS [X]. Diagnostica qué está funcionando, dónde está el problema (creativo, público, oferta o landing) y dame 3 acciones concretas para la próxima semana.","métricas, optimización"],
+["Pauta","Campaña de retargeting","Diseña una campaña de retargeting para [MARCA] dirigida a personas que [VISITARON LA WEB / AGREGARON AL CARRITO / ESCRIBIERON POR DM] sin comprar. Incluye ventanas de tiempo (ej. 3, 7 y 30 días), mensaje para cada etapa, oferta o incentivo sugerido y 2 copys de anuncio.","retargeting, remarketing"],
+["Pauta","Anuncio de TikTok Ads","Escribe 3 guiones de anuncios para TikTok Ads de [PRODUCTO], nativos de la plataforma (que no parezcan publicidad). Usa tendencias de formato como \"POV\", \"cosas que no sabías\" o reacción. Máx. 20 segundos cada uno, con texto en pantalla y CTA.","tiktok ads, video"],
+["Pauta","Anuncios de Google Search","Crea un anuncio de búsqueda responsivo de Google Ads para [PRODUCTO/SERVICIO] en [CIUDAD]: 15 títulos (máx. 30 caracteres cada uno) y 4 descripciones (máx. 90 caracteres). Incluye 10 palabras clave con intención de compra y 10 palabras clave negativas.","google ads, búsqueda"],
+["Pauta","Campaña de mensajes a WhatsApp","Diseña un anuncio de Meta Ads con objetivo de mensajes a WhatsApp para [MARCA]. Incluye: copy del anuncio, 3 preguntas frecuentes precargadas, mensaje de bienvenida automático y el guion de respuesta para convertir la conversación en venta.","whatsapp, mensajes"],
+["Pauta","Plan de testeo A/B","Arma un plan de testeo de 4 semanas para las campañas de [MARCA] con presupuesto de [PRESUPUESTO]. Qué variable probar cada semana (creativo, copy, público, oferta), cómo medir el ganador, cuánto presupuesto asignar y cuándo escalar.","testeo, a/b"],
+["Pauta","Escalar una campaña ganadora","Tengo un anuncio con costo por resultado de [X] y ROAS de [X] durante [DÍAS] días con [PRESUPUESTO] diario. Explícame cómo escalarlo sin romper el rendimiento: escalado vertical vs. horizontal, porcentajes de aumento, cada cuánto y señales de alerta para frenar.","escalar, presupuesto"],
+["Pauta","Oferta irresistible","Ayúdame a construir una oferta para anunciar [PRODUCTO] a [PRECIO]. Propón 5 formas de aumentar el valor percibido sin bajar el precio: bonos, garantías, urgencia real, empaquetado o envío. Luego escribe la oferta final en 2 líneas para usarla en el anuncio.","oferta, conversión"],
+["Email marketing","Secuencia de bienvenida","Escribe una secuencia de 4 correos de bienvenida para nuevos suscriptores de [MARCA]: 1) bienvenida y regalo, 2) historia de la marca, 3) producto más vendido con prueba social, 4) oferta con fecha límite. Incluye asunto, preheader y cuerpo corto para cada uno.","email, secuencia"],
+["Email marketing","Carrito abandonado","Escribe 3 correos de carrito abandonado para [TIENDA]: a la hora, a las 24 horas y a las 72 horas. Tono amable, sin presión, con un incentivo solo en el último. Incluye asuntos que den ganas de abrir.","email, ecommerce"],
+["Email marketing","Asuntos que se abren","Dame 15 líneas de asunto para un correo de [MARCA] sobre [TEMA/PROMOCIÓN]. Mezcla curiosidad, beneficio, urgencia y personalización. Máximo 45 caracteres cada una y sin palabras que caigan en spam.","email, asuntos"],
+["WhatsApp","Mensaje de difusión de promoción","Escribe un mensaje de difusión de WhatsApp para clientes de [MARCA] anunciando [PROMOCIÓN]. Corto, cercano, con emojis moderados, beneficio en la primera línea, fecha límite y una pregunta que invite a responder.","whatsapp, difusión"],
+["WhatsApp","Guion de venta por chat","Escribe un guion de conversación de venta por WhatsApp para [PRODUCTO]: saludo, preguntas para entender la necesidad, recomendación, manejo de 3 objeciones comunes ([OBJECIONES]) y cierre con método de pago.","whatsapp, ventas"],
+["Lanzamientos","Plan de lanzamiento de producto","Crea un plan de lanzamiento de 3 semanas para [PRODUCTO] de [MARCA]: fase de expectativa, lanzamiento y post-lanzamiento. Incluye contenido orgánico, pauta, correos, WhatsApp e influencers por semana, con metas medibles.","lanzamiento, plan"],
+["Lanzamientos","Promoción con urgencia real","Diseña una promoción de [DURACIÓN] para [MARCA] con urgencia real (unidades limitadas, fecha fija o bono para los primeros). Incluye el mensaje central, cuenta regresiva en historias y copys para anuncio, correo y WhatsApp.","promoción, urgencia"],
+["Branding","Propuesta de valor","Con esta información: [QUÉ VENDO, A QUIÉN, QUÉ ME HACE DIFERENTE], escribe 5 opciones de propuesta de valor de una sola frase para [MARCA]. Deben ser claras, específicas y fáciles de recordar. Explica cuál recomiendas y por qué.","propuesta de valor, posicionamiento"],
+["Branding","Análisis de competencia","Estos son mis 3 competidores: [COMPETIDOR 1, 2, 3] y esto es lo que sé de ellos: [INFO]. Haz una tabla comparando precio, mensaje principal, público, fortalezas y debilidades. Luego dime 3 oportunidades para que [MARCA] se diferencie.","competencia, investigación"],
+["Branding","Bio de Instagram","Escribe 5 opciones de biografía de Instagram para [MARCA] (máx. 150 caracteres): qué hace, para quién, un diferencial y un CTA hacia el enlace. Usa emojis solo si aportan claridad.","instagram, perfil"],
+["Web y SEO","Textos de página de producto","Escribe la descripción de producto para [PRODUCTO] en mi tienda online: título con palabra clave, 3 beneficios en viñetas, descripción emocional de 80 palabras, especificaciones, preguntas frecuentes y meta descripción de 155 caracteres.","ecommerce, producto"],
+["Web y SEO","Ideas de blog con SEO","Dame 10 ideas de artículos de blog para [MARCA] que respondan preguntas reales de [BUYER PERSONA] sobre [TEMA]. Para cada una: título, palabra clave principal, intención de búsqueda y cómo conectar con [PRODUCTO].","seo, blog"],
+["Web y SEO","Landing page que convierte","Escribe el texto de una landing page para [PRODUCTO/OFERTA]: titular, subtítulo, 3 beneficios, sección de problema, cómo funciona en 3 pasos, testimonios (deja espacio para reales), garantía, preguntas frecuentes y CTA repetido.","landing, conversión"],
+["Influencers","Mensaje para contactar influencer","Escribe un mensaje profesional y cercano para contactar a [INFLUENCER] y proponerle una colaboración con [MARCA]. Explica por qué encaja con su audiencia, qué le ofreces ([CANJE/PAGO]) y el siguiente paso. Máx. 100 palabras.","influencers, outreach"],
+["Influencers","Brief para creador de contenido","Crea un brief para un creador que hará contenido de [PRODUCTO]: objetivo, mensajes clave, lo que no debe decir, formato y duración, fechas, uso de derechos para pauta y cómo se medirá el resultado.","influencers, brief"],
+["Análisis","Reporte mensual para cliente","Con estos datos del mes de [MARCA]: [PEGAR MÉTRICAS DE REDES Y PAUTA], arma un reporte claro para el cliente: resumen en 3 líneas, logros, qué no funcionó, aprendizajes y plan para el próximo mes. Lenguaje sencillo, sin tecnicismos.","reporte, clientes"],
+["Análisis","Voz de marca","Lee estos 3 textos de mi marca: \"[PEGAR TEXTOS]\". Describe mi tono de voz en 5 rasgos, palabras que sí uso, palabras que evito, y reescribe este texto con esa voz: \"[TEXTO NUEVO]\".","voz de marca, estilo"]
+];
+const CATCOL={"Hooks":"--c1","Estrategia":"--c2","Reels / Guiones":"--c3","Copywriting":"--c4","Historias":"--c5","Respuestas DM":"--c6","Imágenes IA":"--c7","Análisis":"--c8","Pauta":"--c3","Email marketing":"--c5","WhatsApp":"--c2","Lanzamientos":"--c1","Branding":"--c4","Web y SEO":"--c6","Influencers":"--c7"};
+const extra=["--c1","--c2","--c3","--c4","--c5","--c6","--c7","--c8"];
+const KEY="banco-prompts-v1";
+const seed=()=>SEED.map((s,i)=>({id:"s"+i,cat:s[0],title:s[1],text:s[2],tags:s[3].split(",").map(t=>t.trim()),fav:false}));
+let data;
+try{data=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(!Array.isArray(data))data=seed();
+const KEY_SEEN="banco-prompts-seen";
+let seen=null;try{seen=JSON.parse(localStorage.getItem(KEY_SEEN))}catch(e){}
+if(!Array.isArray(seen))seen=[];
+{const all=seed(),have=new Set(data.map(d=>d.title));all.forEach(s=>{if(!seen.includes(s.title)&&!have.has(s.title))data.push({...s,id:"n"+Date.now()+s.id})})}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(data));localStorage.setItem(KEY_SEEN,JSON.stringify(SEED.map(s=>s[1])))}catch(e){}};
+save();
+let onlyFav=false,editing=null,pendingDel=null;
+const $=id=>document.getElementById(id);
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const hl=(s,q)=>{s=esc(s);if(!q)return s;const r=new RegExp("("+q.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+")","gi");return s.replace(r,"<mark>$1</mark>")};
+const col=c=>{if(CATCOL[c])return CATCOL[c];let h=0;for(const ch of c)h=(h+ch.charCodeAt(0))%8;return extra[h]};
+function toast(m){const t=$("toast");t.textContent=m;t.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>t.hidden=true,1800)}
+function cats(){return[...new Set(data.map(d=>d.cat))]}
+function renderCats(){const cur=$("cat").value;$("cat").innerHTML='<option value="">Todas las categorías</option>'+cats().map(c=>`<option>${esc(c)}</option>`).join("");$("cat").value=cats().includes(cur)?cur:"";$("catList").innerHTML=cats().map(c=>`<option value="${esc(c)}">`).join("")}
+function render(){
+  const q=$("q").value.trim(),c=$("cat").value,ql=q.toLowerCase();
+  const list=data.filter(d=>(!c||d.cat===c)&&(!onlyFav||d.fav)&&(!ql||(d.title+" "+d.text+" "+d.tags.join(" ")).toLowerCase().includes(ql)));
+  $("count").textContent=data.length+" prompts";
+  $("grid").innerHTML=list.length?list.map(d=>`<article class="card" style="--cat:var(${col(d.cat)})">
+    <div class="top"><div><div class="cat">${esc(d.cat)}</div><h3>${hl(d.title,q)}</h3></div>
+    <button class="star ${d.fav?"fav":""}" data-a="fav" data-id="${d.id}" aria-label="Favorito">${d.fav?"★":"☆"}</button></div>
+    <pre class="ptext">${hl(d.text,q)}</pre>
+    <div class="tags">${d.tags.filter(Boolean).map(t=>`<span class="tag">#${hl(t,q)}</span>`).join("")}</div>
+    <div class="actions"><button class="btn sm" data-a="copy" data-id="${d.id}">Copiar</button><button class="btn sm" data-a="edit" data-id="${d.id}">Editar</button><button class="btn sm del ${pendingDel===d.id?"confirm":""}" data-a="del" data-id="${d.id}">${pendingDel===d.id?"¿Eliminar?":"Eliminar"}</button></div>
+  </article>`).join(""):'<p class="empty">No hay prompts con ese filtro.</p>';
+}
+function copy(text,msg){(navigator.clipboard?navigator.clipboard.writeText(text):Promise.reject()).then(()=>toast(msg)).catch(()=>toast("No se pudo copiar; selecciona el texto manualmente"))}
+$("grid").addEventListener("click",e=>{
+  const b=e.target.closest("[data-a]");if(!b)return;const d=data.find(x=>x.id===b.dataset.id);if(!d)return;
+  const a=b.dataset.a;
+  if(a!=="del")pendingDel=null;
+  if(a==="fav"){d.fav=!d.fav;save();render()}
+  if(a==="copy"){copy(d.text,"Prompt copiado");render()}
+  if(a==="edit")openDlg(d);
+  if(a==="del"){if(pendingDel===d.id){data=data.filter(x=>x!==d);pendingDel=null;save();renderCats();toast("Prompt eliminado")}else pendingDel=d.id;render()}
+});
+function openDlg(d){editing=d||null;$("dlgTitle").textContent=d?"Editar prompt":"Nuevo prompt";$("fTitle").value=d?d.title:"";$("fCat").value=d?d.cat:($("cat").value||"");$("fText").value=d?d.text:"";$("fTags").value=d?d.tags.join(", "):"";$("dlg").showModal()}
+$("new").onclick=()=>openDlg();
+$("cancel").onclick=()=>$("dlg").close();
+$("form").addEventListener("submit",e=>{e.preventDefault();
+  const v={title:$("fTitle").value.trim(),cat:$("fCat").value.trim(),text:$("fText").value.trim(),tags:$("fTags").value.split(",").map(t=>t.trim().replace(/^#/,"")).filter(Boolean)};
+  if(editing)Object.assign(editing,v);else data.unshift({id:"u"+Date.now(),fav:false,...v});
+  save();renderCats();render();$("dlg").close();toast(editing?"Cambios guardados":"Prompt creado")});
+$("q").oninput=render;$("cat").onchange=render;
+$("favs").onclick=()=>{onlyFav=!onlyFav;$("favs").classList.toggle("on",onlyFav);render()};
+let ioMode;
+function openIO(m){ioMode=m;$("ioTitle").textContent=m==="exp"?"Exportar backup":"Importar backup";
+  $("ioHint").textContent=m==="exp"?"Copia este texto y guárdalo en un archivo o nota. Para recuperarlo, usa Importar backup.":"Pega el texto del backup o sube el archivo .json. Reemplaza tu banco actual.";
+  $("ioText").value=m==="exp"?JSON.stringify(data,null,1):"";$("ioFile").parentElement.hidden=m==="exp";$("ioAction").textContent=m==="exp"?"Copiar":"Importar";$("io").showModal()}
+$("exp").onclick=()=>openIO("exp");$("imp").onclick=()=>openIO("imp");$("ioClose").onclick=()=>$("io").close();
+$("ioFile").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>$("ioText").value=r.result;r.readAsText(f)};
+$("ioAction").onclick=()=>{
+  if(ioMode==="exp"){$("ioText").select();copy($("ioText").value,"Backup copiado");return}
+  try{const n=JSON.parse($("ioText").value);if(!Array.isArray(n)||!n.every(x=>x.title&&x.text))throw 0;
+    data=n.map((x,i)=>({id:x.id||"i"+i+Date.now(),cat:x.cat||"General",title:x.title,text:x.text,tags:Array.isArray(x.tags)?x.tags:[],fav:!!x.fav}));
+    save();renderCats();render();$("io").close();toast("Backup importado")}
+  catch(e){toast("Ese texto no es un backup válido. Revisa que esté completo.")}};
+let resetArm=false;
+$("reset").onclick=()=>{if(!resetArm){resetArm=true;$("reset").textContent="¿Seguro? Toca de nuevo";setTimeout(()=>{resetArm=false;$("reset").textContent="Restaurar originales"},3000);return}
+  data=seed();save();renderCats();render();resetArm=false;$("reset").textContent="Restaurar originales";toast("Prompts originales restaurados")};
+renderCats();render();
+</script>
+</body>
+</html>
